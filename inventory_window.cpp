@@ -48,20 +48,29 @@ inventory_window::~inventory_window()
 
 void inventory_window::on_actionLoad_Inventory_Database_triggered()
 {
-//    QString databaseLocation = QFileDialog::getOpenFileName(this, tr("Open Database"), ".");
+    QString databaseLocation = QFileDialog::getOpenFileName(this, tr("Open Database"), ".");
+    QSqlDatabase inventory_DB=QSqlDatabase::addDatabase("QSQLITE");
+    inventory_DB.setDatabaseName(databaseLocation);
+    qDebug()  << inventory_DB;
+    if(!inventory_DB.open())
+    {
+        qDebug()  << inventory_DB.open();
+        qDebug()  << inventory_DB.isOpen();
+        ui->statusBar->showMessage(tr("Failed to open the database."));
+    }
+    else
+    {
+        qDebug()  << inventory_DB.open();
+        qDebug()  << inventory_DB.isOpen();
+        ui->statusBar->showMessage(tr("Successfully connected to the database."));
+    }
 
     QSqlQueryModel *model = new QSqlQueryModel;
-//    qDebug() << "Action ! Action !";
-//    statusBar()->showMessage(tr("Action !"));
 
-    QSqlDatabase inventory_DB=QSqlDatabase::addDatabase("QSQLITE");
-    inventory_DB.setDatabaseName("exampleDB.db");
-    qDebug()  << inventory_DB;
+    QSqlQuery *initial_query=new QSqlQuery(inventory_DB);
+    initial_query->prepare("SELECT * FROM provider_services_host WHERE active=1 AND domain_id=172 AND name LIKE '%sorind%'");
+    initial_query->exec();
+    model->setQuery(*initial_query);
 
-    if(!inventory_DB.open())
-//        qDebug()  << inventory_DB.open();
-//        qDebug()  << inventory_DB.isOpen();
-        ui->statusBar->showMessage(tr("Failed to open the database."));
-    else
-        ui->statusBar->showMessage(tr("Successfully connected to the database."));
+    ui->tableView->setModel(model);
 }
