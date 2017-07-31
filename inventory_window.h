@@ -19,19 +19,25 @@ class inventory_window : public QMainWindow
 public:
     explicit inventory_window(QWidget *parent = 0);
     ~inventory_window();
+    void clear_PersonLIneEdit();
+    void clear_HwLIneEdit();
 
 private slots:
     void on_actionLoad_Inventory_Database_triggered();
 
     void on_actionCreate_New_Database_triggered();
 
-    void on_pushButton_clicked();
+    void on_pushButtonCreateHardware_clicked();
+
+    void on_pushButtonCreatePerson_clicked();
 
 private:
     Ui::inventory_window *ui;
     QSqlDatabase inventoryDB;
-    QSqlQueryModel *tableViewModel;
-    QSqlQuery *loadInventoryDB;
+    QSqlQueryModel *personTableViewModel;
+    QSqlQueryModel *hardwareTableViewModel;
+    QSqlQuery *loadInventoryDB_person;
+    QSqlQuery *loadInventoryDB_hardware;
     QString dbPath;
 };
 
