@@ -48,6 +48,7 @@
      <string>File</string>
     </property>
     <addaction name="actionLoad_Inventory_Database"/>
+    <addaction name="actionCreate_New_Database"/>
    </widget>
    <addaction name="fileMenu"/>
   </widget>
@@ -55,6 +56,11 @@
   <action name="actionLoad_Inventory_Database">
    <property name="text">
     <string>Load Inventory Database</string>
+   </property>
+  </action>
+  <action name="actionCreate_New_Database">
+   <property name="text">
+    <string>Create New Database</string>
    </property>
   </action>
  </widget>
