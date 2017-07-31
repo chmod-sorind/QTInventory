@@ -13,32 +13,6 @@ inventory_window::inventory_window(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-
-//    QGridLayout* layout = new QGridLayout;
-//    QSqlQueryModel *model = new QSqlQueryModel;
-//    QTableView *view = new QTableView;
-
-//    model->setHeaderData(0, Qt::Horizontal, tr("a"));
-//    model->setHeaderData(1, Qt::Horizontal, tr("b"));
-//    model->headerData(0, Qt::Horizontal, tr("ASD"));
-
-//    view->setModel(model);
-
-//    layout->addWidget(view);
-//    layout->setAlignment(view,Qt::AlignCenter);
-//    setCentralWidget(view);
-
-
-//    QStringList headers;
-//    headers << tr("Header 1") << tr("Header 2") << tr("Header 3") << tr("Heaeder 4");
-//    ui->tableWidget->insertColumn(0);
-//    ui->tableWidget->insertColumn(1);
-//    ui->tableWidget->insertColumn(2);
-//    ui->tableWidget->insertColumn(3);
-//    ui->tableWidget->setHorizontalHeaderLabels(headers);
-
-
 }
 
 inventory_window::~inventory_window()
@@ -68,7 +42,7 @@ void inventory_window::on_actionLoad_Inventory_Database_triggered()
     QSqlQueryModel *model = new QSqlQueryModel;
 
     QSqlQuery *initial_query=new QSqlQuery(inventory_DB);
-    initial_query->prepare("SELECT * FROM provider_services_host WHERE active=1 AND domain_id=172 AND name LIKE '%sorind%'");
+    initial_query->prepare("SELECT id,name,primary_mac_address,secondary_mac_address,container_id,display_unit_id,config_profile_bag_id,public_key_fingerprint FROM provider_services_host WHERE active=1 AND domain_id=172 AND name LIKE '%sorind%'");
     initial_query->exec();
     model->setQuery(*initial_query);
 
