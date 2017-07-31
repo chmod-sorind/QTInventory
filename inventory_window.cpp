@@ -3,12 +3,10 @@
 #include <QDebug>
 #include <QTableView>
 #include <QtSql/QSqlQueryModel>
-#include <QGridLayout>
 #include <QString>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
-#include <QDir>
 
 inventory_window::inventory_window(QWidget *parent) :
     QMainWindow(parent),
@@ -25,45 +23,87 @@ inventory_window::~inventory_window()
 
 void inventory_window::on_actionLoad_Inventory_Database_triggered()
 {
-    QString databaseLocation = QFileDialog::getOpenFileName(this, tr("Open Database"), "/");
+    dbPath = QFileDialog::getOpenFileName(this, tr("Open Database"), "/");
 
-    if(databaseLocation == NULL)
+    if(dbPath == NULL)
     {
         ui->statusBar->showMessage(tr("Action canceled."));
     }
     else
     {
-        QSqlDatabase inventory_DB=QSqlDatabase::addDatabase("QSQLITE");
-        inventory_DB.setDatabaseName(databaseLocation);
-        if(!inventory_DB.open())
+        inventoryDB=QSqlDatabase::addDatabase("QSQLITE");
+        inventoryDB.setDatabaseName(dbPath);
+        if(!inventoryDB.open())
         {
-            ui->statusBar->showMessage(tr("Failed to open the database."));
+            ui->statusBar->showMessage(tr("Failed to open the database ") + dbPath);
         }
         else
         {
-            ui->statusBar->showMessage(tr("Successfully connected to the database."));
-            QSqlQueryModel *model = new QSqlQueryModel;
-            QSqlQuery *initial_query=new QSqlQuery(inventory_DB);
-            initial_query->prepare("SELECT * FROM person");
-            initial_query->exec();
-            model->setQuery(*initial_query);
-            ui->tableView->setModel(model);
+            tableViewModel=new QSqlQueryModel;
+            loadInventoryDB=new QSqlQuery(inventoryDB);
+            loadInventoryDB->prepare("SELECT * FROM person");
+            loadInventoryDB->exec();
+            tableViewModel->setQuery(*loadInventoryDB);
+            ui->tableView->setModel(tableViewModel);
+            ui->statusBar->showMessage(tr("Successfully connected to the database: ") + dbPath);
         }
     }
 }
 
 void inventory_window::on_actionCreate_New_Database_triggered()
 {
-    QString newDbPath = QFileDialog::getSaveFileName(this, tr("Save New Database"), "/", tr("Database Files (*.db)"));
+    dbPath = QFileDialog::getSaveFileName(this, tr("Save New Database"), "/", tr("Database Files (*.db)"));
+    if(dbPath == NULL)
+    {
+        ui->statusBar->showMessage(tr("Action canceled."));
+    }
+    else
+    {
+        inventoryDB=QSqlDatabase::addDatabase("QSQLITE");
+        inventoryDB.setDatabaseName(dbPath);
+        inventoryDB.open();
 
-    qDebug() << newDbPath;
+        QSqlQuery *createPersonTable=new QSqlQuery(inventoryDB);
+        QSqlQuery *createDepartmentTable=new QSqlQuery(inventoryDB);
+        QSqlQuery *createJob_titleTable=new QSqlQuery(inventoryDB);
 
-    QSqlDatabase newDatabase=QSqlDatabase::addDatabase("QSQLITE");
-    newDatabase.setDatabaseName(newDbPath);
-    newDatabase.open();
+        createPersonTable->prepare("CREATE table person(id integer NOT NULL PRIMARY KEY,firstname varchar(20),lastname varchar(20),active integer)");
+        createPersonTable->exec();
+        createDepartmentTable->prepare("CREATE table department(id integer NOT NULL PRIMARY KEY,name varchar(20));");
+        createDepartmentTable->exec();
+        createJob_titleTable->prepare("CREATE table job_title(id integer NOT NULL PRIMARY KEY,title varchar(30));");
+        createJob_titleTable->exec();
 
-    QSqlQuery query;
-    query.exec("CREATE table person(id integer NOT NULL PRIMARY KEY,firstname varchar(20),lastname varchar(20),active integer);"
-               "CREATE table department(id integer NOT NULL PRIMARY KEY,name varchar(20));"
-               "CREATE table job_title(id integer NOT NULL PRIMARY KEY,title varchar(30));");
+        tableViewModel = new QSqlQueryModel;
+        loadInventoryDB=new QSqlQuery(inventoryDB);
+        loadInventoryDB->prepare("SELECT * FROM person");
+        loadInventoryDB->exec();
+        tableViewModel->setQuery(*loadInventoryDB);
+        ui->tableView->setModel(tableViewModel);
+        ui->statusBar->showMessage(tr("Successfully connected to the database: ") + dbPath);
+    }
+
+}
+
+void inventory_window::on_pushButton_clicked()
+{
+    if(!inventoryDB.open())
+    {
+       ui->statusBar->showMessage(tr("No DB Connection."));
+    }
+    else
+    {
+        QSqlQuery *insertIntoPersonTable=new QSqlQuery(inventoryDB);
+        insertIntoPersonTable->prepare("INSERT INTO person (firstname, lastname, active) VALUES (:firstname, :lastname, :active)");
+        insertIntoPersonTable->bindValue(":firstname", ui->firstNameLineEdit->text());
+        insertIntoPersonTable->bindValue(":lastname",ui->lastNameLineEdit->text());
+        insertIntoPersonTable->bindValue(":active", 1);
+        insertIntoPersonTable->exec();
+        loadInventoryDB=new QSqlQuery(inventoryDB);
+        loadInventoryDB->prepare("SELECT * FROM person");
+        loadInventoryDB->exec();
+        tableViewModel->setQuery(*loadInventoryDB);
+        ui->tableView->setModel(tableViewModel);
+
+    }
 }
