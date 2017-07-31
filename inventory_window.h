@@ -21,6 +21,8 @@ public:
 private slots:
     void on_actionLoad_Inventory_Database_triggered();
 
+    void on_actionCreate_New_Database_triggered();
+
 private:
     Ui::inventory_window *ui;
 };
