@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QtSql/QSqlQueryModel>
 #include <QString>
+#include <QDateTime>
 
 namespace Ui {
 class inventory_window;
@@ -21,6 +22,7 @@ public:
     ~inventory_window();
     void clear_PersonLIneEdit();
     void clear_HwLIneEdit();
+    QString get_time_now();
 
 private slots:
     void on_actionLoad_Inventory_Database_triggered();

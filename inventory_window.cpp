@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QDateTime>
 
 inventory_window::inventory_window(QWidget *parent) :
     QMainWindow(parent),
@@ -19,6 +20,13 @@ inventory_window::inventory_window(QWidget *parent) :
 inventory_window::~inventory_window()
 {
     delete ui;
+}
+
+QString inventory_window::get_time_now()
+{
+    QDateTime t1(QDateTime::currentDateTime());
+    QString t2 = t1.toString("yyyy-MM-dd hh:mm:ss");
+    return t2;
 }
 
 void inventory_window::clear_HwLIneEdit()
@@ -64,7 +72,10 @@ void inventory_window::on_actionLoad_Inventory_Database_triggered()
             ui->tableViewPerson->setModel(personTableViewModel);
 
             loadInventoryDB_hardware=new QSqlQuery(inventoryDB);
-            loadInventoryDB_hardware->prepare("SELECT * FROM hardware");
+            loadInventoryDB_hardware->prepare("SELECT hw.type as Type,"
+                                              "hw.primary_mac_address as 'MAC Address',"
+                                              "hw.last_modified as 'Update Time',"
+                                              "hw.current_user_fullname as Assignee FROM hardware as hw");
             loadInventoryDB_hardware->exec();
             qDebug() << "Load Hardware Table Errors: " << loadInventoryDB_hardware->lastError();
             hardwareTableViewModel->setQuery(*loadInventoryDB_hardware);
@@ -103,7 +114,7 @@ void inventory_window::on_actionCreate_New_Database_triggered()
                                      "type VARCHAR(20),"
                                      "primary_mac_address VARCHAR(20),"
                                      "active BOOLEAN,"
-                                     "last_modified TIMESTAMP,"
+                                     "last_modified CURRENT_TIMESTAMP,"
                                      "current_user_fullname VARCHAR(50),"
                                      "current_user_id,"
                                      "FOREIGN KEY(current_user_id) REFERENCES person(id))");
@@ -125,7 +136,10 @@ void inventory_window::on_actionCreate_New_Database_triggered()
         ui->tableViewPerson->setModel(personTableViewModel);
 
         loadInventoryDB_hardware=new QSqlQuery(inventoryDB);
-        loadInventoryDB_hardware->prepare("SELECT * FROM hardware");
+        loadInventoryDB_hardware->prepare("SELECT hw.type as Type,"
+                                          "hw.primary_mac_address as 'MAC Address',"
+                                          "hw.last_modified as 'Update Time',"
+                                          "hw.current_user_fullname as Assignee FROM hardware as hw");
         loadInventoryDB_hardware->exec();
         qDebug() << "Load Hardware Table Errors: " << loadInventoryDB_hardware->lastError();
         hardwareTableViewModel->setQuery(*loadInventoryDB_hardware);
@@ -162,7 +176,10 @@ void inventory_window::on_pushButtonCreatePerson_clicked()
         ui->tableViewPerson->setModel(personTableViewModel);
 
         loadInventoryDB_hardware=new QSqlQuery(inventoryDB);
-        loadInventoryDB_hardware->prepare("SELECT * FROM hardware");
+        loadInventoryDB_hardware->prepare("SELECT hw.type as Type,"
+                                          "hw.primary_mac_address as 'MAC Address',"
+                                          "hw.last_modified as 'Update Time',"
+                                          "hw.current_user_fullname as Assignee FROM hardware as hw");
         loadInventoryDB_hardware->exec();
         qDebug() << "Load Hardware Table Errors: " << loadInventoryDB_hardware->lastError();
         hardwareTableViewModel->setQuery(*loadInventoryDB_hardware);
@@ -184,7 +201,7 @@ void inventory_window::on_pushButtonCreateHardware_clicked()
         insertIntoPersonTable->bindValue(":type", ui->hwTypeLineEdit->text());
         insertIntoPersonTable->bindValue(":primary_mac_address",ui->hwPrimaryMacLineEdit->text());
         insertIntoPersonTable->bindValue(":active", 1);
-        insertIntoPersonTable->bindValue(":last_modified","DATETIME('NOW')");
+        insertIntoPersonTable->bindValue(":last_modified", get_time_now());
         insertIntoPersonTable->bindValue(":current_user_fullname",ui->hwAsigneeLineEdit->text());
         insertIntoPersonTable->exec();
         qDebug() << "Insert Into Person Table Errors: " << insertIntoPersonTable->lastError();
@@ -200,7 +217,10 @@ void inventory_window::on_pushButtonCreateHardware_clicked()
         ui->tableViewPerson->setModel(personTableViewModel);
 
         loadInventoryDB_hardware=new QSqlQuery(inventoryDB);
-        loadInventoryDB_hardware->prepare("SELECT * FROM hardware");
+        loadInventoryDB_hardware->prepare("SELECT hw.type as Type,"
+                                          "hw.primary_mac_address as 'MAC Address',"
+                                          "hw.last_modified as 'Update Time',"
+                                          "hw.current_user_fullname as Assignee FROM hardware as hw");
         loadInventoryDB_hardware->exec();
         qDebug() << "Load Hardware Table Errors: " << loadInventoryDB_hardware->lastError();
         hardwareTableViewModel->setQuery(*loadInventoryDB_hardware);
