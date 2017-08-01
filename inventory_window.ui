@@ -298,6 +298,18 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>firstNameLineEdit</tabstop>
+  <tabstop>lastNameLineEdit</tabstop>
+  <tabstop>departmentLineEdit</tabstop>
+  <tabstop>pushButtonCreatePerson</tabstop>
+  <tabstop>tableViewPerson</tabstop>
+  <tabstop>hwTypeLineEdit</tabstop>
+  <tabstop>hwPrimaryMacLineEdit</tabstop>
+  <tabstop>hwAsigneeLineEdit</tabstop>
+  <tabstop>pushButtonCreateHardware</tabstop>
+  <tabstop>tableViewHardware</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
